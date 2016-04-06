@@ -7,18 +7,20 @@ var app = express();
 app.set('port', config.port || 3000);
 
 app.get('/m', function(req, res) {
-  
+
   var firstManUrl = _.head(config.targetsMan);
 
-  res.redirect(firstManUrl);
+  return res.redirect(firstManUrl);
 });
 app.get('/w', function(req, res) {
-  
+
   var firstWomanUrl = _.head(config.targetsWoman);
 
-  res.redirect(firstWomanUrl);
+  return res.redirect(firstWomanUrl);
 });
-
+app.use( * , function(req, res) {
+  return res.redirect('http://artfest.ntu.edu.tw/');
+})
 
 var server = http
   .createServer(app)
