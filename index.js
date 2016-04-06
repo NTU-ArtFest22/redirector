@@ -18,7 +18,7 @@ app.get('/w', function(req, res) {
 
   return res.redirect(firstWomanUrl);
 });
-app.use( * , function(req, res) {
+app.use(function(req, res) {
   return res.redirect('http://artfest.ntu.edu.tw/');
 })
 
