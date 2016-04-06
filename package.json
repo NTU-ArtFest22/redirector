@@ -1,0 +1,23 @@
+{
+  "name": "redirector",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NTU-ArtFest22/redirector.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NTU-ArtFest22/redirector/issues"
+  },
+  "homepage": "https://github.com/NTU-ArtFest22/redirector#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "lodash": "^4.8.2"
+  }
+}
