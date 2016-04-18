@@ -27,7 +27,7 @@
     </table>
     <br>
     <br>
-    <a href="/rmpcl6/batch">批次刪除</a>
+    <a href="/rmpcl6">基本刪除</a>
     <br>
     <br>
     <table class="uk-table uk-table-hover uk-table-striped">
@@ -39,24 +39,24 @@
         </tr>
       </thead>
       <tbody>
-        <% for(var i=0; i<talks.length; i++) {%>
-        <tr>
-          <td>
-            <form action='/rmpcl6/delete' method="post">
-              <input type="hidden" name="message" value='<%= talks[i].message %>'></input>
-              <input type="submit" value="Delete">
-            </form>
-          </td>
-          <td>
-            <%= talks[i].message %>
-          </td>
-          <td>
-            <%= talks[i].count %>
-          </td>
-          <% } %>
-        </tr>
-      </tbody>
-    </table>
+        <form action='/rmpcl6/deletes' method="post">
+          <% for(var i=0; i<talks.length; i++) {%>
+          <tr>
+            <td>
+              <input type="checkbox" name="messages[]" value='<%= talks[i].message %>'></input>
+            </td>
+            <td>
+              <%= talks[i].message %>
+            </td>
+            <td>
+              <%= talks[i].count %>
+            </td>
+            <% } %>
+          </tr>
+        </tbody>
+      </table>
+      <input type="submit" value="Delete">
+    </form>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.26.2/js/uikit.min.js"></script>
   </body>
 </html>

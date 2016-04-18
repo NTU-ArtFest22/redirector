@@ -5,7 +5,9 @@ var _ = require('lodash');
 var app = express();
 var mongojs = require('mongojs')
 var db = mongojs('ntuaf', ['jokes', 'talks', 'talks_admin'])
+var Promise = require('bluebird');
 var Talks = db.talks;
+Promise.promisifyAll(Talks);
 var Users = db.talks_admin;
 var bodyParser = require('body-parser');
 
@@ -48,7 +50,6 @@ app.get('/login', function(req, res) {
   return res.render('login')
 });
 app.post('/login', function(req, res) {
-  console.log(req.body)
   var name = req.body.username
   var password = req.body.password
   Users.find({
@@ -71,6 +72,45 @@ app.use(function(req, res, next) {
     return next();
   }
 })
+app.get('/rmpcl6/batch', function(req, res) {
+  Talks.aggregate([{
+    $group: {
+      _id: {
+        'type': '$type'
+      },
+      count: {
+        $sum: 1
+      }
+    }
+  }], function(err, count) {
+    Talks.aggregate([{
+      $match: {
+        'type': 'text'
+      }
+    }, {
+      $group: {
+        _id: {
+          'message': '$message'
+        },
+        count: {
+          $sum: 1
+        }
+      }
+    }], function(err, result) {
+      result = _.map(result, function(row) {
+        return {
+          message: row._id.message,
+          count: row.count
+        }
+      })
+      result = _.reverse(_.sortBy(result, 'count'));
+      return res.render('talks_batch', {
+        count: count,
+        talks: result
+      })
+    })
+  })
+});
 app.get('/rmpcl6', function(req, res) {
   Talks.aggregate([{
     $group: {
@@ -103,7 +143,6 @@ app.get('/rmpcl6', function(req, res) {
         }
       })
       result = _.reverse(_.sortBy(result, 'count'));
-      console.log(count)
       return res.render('talks', {
         count: count,
         talks: result
@@ -117,6 +156,18 @@ app.post('/rmpcl6/delete', function(req, res) {
     type: 'text',
     message: query
   }, function(err, result, k) {
+    return res.redirect('/rmpcl6')
+  })
+});
+app.post('/rmpcl6/deletes', function(req, res) {
+  var messages = req.body.messages
+  return Promise.all(_.map(messages, function(message) {
+    return Talks.removeAsync({
+      type: 'text',
+      message: message
+    })
+  }))
+  .then(function(){
     return res.redirect('/rmpcl6')
   })
 });
