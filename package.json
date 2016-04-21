@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/NTU-ArtFest22/redirector#readme",
   "dependencies": {
+    "bad-words-chinese": "^1.0.0",
     "body-parser": "^1.15.0",
     "connect-redis": "^3.0.2",
     "ejs": "^2.4.1",
@@ -24,6 +25,8 @@
     "express-session": "^1.13.0",
     "ioredis": "^1.15.1",
     "lodash": "^4.8.2",
-    "mongojs": "^2.3.0"
+    "mongojs": "^2.3.0",
+    "request": "^2.72.0",
+    "universal-analytics": "^0.3.11"
   }
 }

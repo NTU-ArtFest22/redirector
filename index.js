@@ -6,18 +6,28 @@ var app = express();
 var mongojs = require('mongojs')
 var db = mongojs('ntuaf', ['jokes', 'talks', 'talks_admin'])
 var Promise = require('bluebird');
-var Talks = db.talks;
+
+global.Talks = db.talks;
 Promise.promisifyAll(Talks);
-var Users = db.talks_admin;
+global.Users = db.talks_admin;
+Promise.promisifyAll(Users);
+
 var bodyParser = require('body-parser');
 
-var session = require('express-session');
-var RedisStore = require('connect-redis')(session);
+var ua = require('universal-analytics');
+var ga = ua('UA-68973533-7');
+
 var Redis = require('ioredis');
-var redisClient = new Redis({
+
+var defaultMessage = require('./default');
+
+global.redisClient = new Redis({
   host: 'localhost',
   port: '6379'
 });
+
+var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -64,6 +74,12 @@ app.post('/login', function(req, res) {
     return res.redirect('/rmpcl6')
   })
 });
+app.post('/message', function(req, res) {
+  var event = req.body.event;
+  defaultMessage(event, function(result) {
+    return res.json(result);
+  })
+})
 app.use(function(req, res, next) {
   if (!req.session.current_user || req.session.current_user.user_type !== 'admin') {
     return res.redirect('http://artfest.ntu.edu.tw/');
@@ -162,14 +178,14 @@ app.post('/rmpcl6/delete', function(req, res) {
 app.post('/rmpcl6/deletes', function(req, res) {
   var messages = req.body.messages
   return Promise.all(_.map(messages, function(message) {
-    return Talks.removeAsync({
-      type: 'text',
-      message: message
+      return Talks.removeAsync({
+        type: 'text',
+        message: message
+      })
+    }))
+    .then(function() {
+      return res.redirect('/rmpcl6')
     })
-  }))
-  .then(function(){
-    return res.redirect('/rmpcl6')
-  })
 });
 var server = http
   .createServer(app)
