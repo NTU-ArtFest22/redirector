@@ -132,7 +132,7 @@ function getAnswer(say) {
 }
 
 
-var defaultMessage = function(words, callback) {
+var defaultMessage = function(words, event, callback) {
   var response = getAnswer(words);
   if (words && words.length <= 20 && !filter.isProfane(words)) {
     Talks.insert({
@@ -152,6 +152,14 @@ var defaultMessage = function(words, callback) {
     } else if (random(5) === 0) {
       callback(response);
     } else {
+      var matching = {
+        count: {
+          $gte: 1
+        }
+      }
+      if (event.senderID === 'web') {
+        matching['_id.type'] = 'text'
+      }
       Talks.aggregate([{
         $group: {
           _id: {
@@ -163,11 +171,7 @@ var defaultMessage = function(words, callback) {
           }
         }
       }, {
-        $match: {
-          count: {
-            $gte: 2
-          }
-        }
+        $match: matching
       }, {
         $sample: {
           size: 10
@@ -219,7 +223,6 @@ module.exports = function(event, callback) {
       })
     })
   }
-  var isGroup = event.isGroup;
   return redisClient
     .multi()
     .incr(event.threadID)
@@ -244,7 +247,7 @@ module.exports = function(event, callback) {
       }
       ga.event("Receive", "message", event.body).send()
 
-      defaultMessage(event.body, function(response) {
+      defaultMessage(event.body, event, function(response) {
         if (response.type === 'sticker') {
           console.log('ga-sticker-content')
           ga.event("Answer", "Sticker", response).send()

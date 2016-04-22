@@ -75,7 +75,7 @@ app.post('/login', function(req, res) {
   })
 });
 app.post('/message', function(req, res) {
-  var event = req.body.event;
+  var event = req.body;
   defaultMessage(event, function(result) {
     return res.json(result);
   })
