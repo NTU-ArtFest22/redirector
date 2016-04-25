@@ -178,15 +178,11 @@ var defaultMessage = function(words, event, callback) {
         }
       }], function(err, messages) {
         messages = _.map(messages, function(message) {
-          console.log(message._id.message)
-          console.log(words)
-          console.log(input)
-          if (message._id.message !== input) {
+          if (message._id.message !== inputpm2) {
             return message
           }
         })
         messages = _.compact(messages);
-        console.log(messages)
         if (messages.length !== 0 && random(3) === 0) {
           text = _.maxBy(messages, function(message) {
             return message.count;
