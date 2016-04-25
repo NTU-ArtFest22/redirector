@@ -182,7 +182,8 @@ var defaultMessage = function(words, event, callback) {
           }
         })
         messages = _.compact(messages);
-        if (messages.length !== 0 && random(1) === 0) {
+        console.log(messages)
+        if (messages.length !== 0 && random(3) === 0) {
           text = _.maxBy(messages, function(message) {
             return message.count;
           })
