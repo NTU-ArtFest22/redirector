@@ -43,7 +43,7 @@
           <% for(var i=0; i<talks.length; i++) {%>
           <tr class="messages" >
             <td>
-              <input class="messages" type="checkbox" name="messages[]" value='<%= talks[i].message %>'></input>
+              <input class="messages" type="checkbox" name="messages[]" value='<%= talks[i].id_array %>'></input>
             </td>
             <td>
               <%= talks[i].message %>

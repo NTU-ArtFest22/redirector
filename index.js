@@ -11,6 +11,12 @@ global.Talks = db.talks;
 Promise.promisifyAll(Talks);
 global.Users = db.talks_admin;
 Promise.promisifyAll(Users);
+Talks.ensureIndex({
+  "message": "text"
+});
+
+var ObjectId = require('mongojs').ObjectID;
+
 
 var bodyParser = require('body-parser');
 
@@ -108,7 +114,10 @@ app.get('/rmpcl6/batch', function(req, res) {
     }, {
       $group: {
         _id: {
-          'message': '$message'
+          'message': '$message',
+        },
+        id_array: {
+          $addToSet: '$_id'
         },
         count: {
           $sum: 1
@@ -118,6 +127,7 @@ app.get('/rmpcl6/batch', function(req, res) {
       result = _.map(result, function(row) {
         return {
           message: row._id.message,
+          id_array: row.id_array,
           count: row.count
         }
       })
@@ -149,6 +159,9 @@ app.get('/rmpcl6', function(req, res) {
         _id: {
           'message': '$message'
         },
+        id_array: {
+          $addToSet: '$_id'
+        },
         count: {
           $sum: 1
         }
@@ -157,6 +170,7 @@ app.get('/rmpcl6', function(req, res) {
       result = _.map(result, function(row) {
         return {
           message: row._id.message,
+          id_array: row.id_array,
           count: row.count
         }
       })
@@ -169,24 +183,35 @@ app.get('/rmpcl6', function(req, res) {
   })
 });
 app.post('/rmpcl6/delete', function(req, res) {
-  var query = req.body.message
+  var query = req.body.message.split(",")
+  query = _.map(query, function(id) {
+    return ObjectId(id)
+  });
   Talks.remove({
     type: 'text',
-    message: query
-  }, function(err, result, k) {
+    _id: {
+      $in: query
+    }
+  }, function(err, result) {
     return res.redirect('/rmpcl6')
   })
 });
 app.post('/rmpcl6/deletes', function(req, res) {
   var messages = req.body.messages
   return Promise.all(_.map(messages, function(message) {
+      message = message.split(",");
+      message = _.map(message, function(id) {
+        return ObjectId(id)
+      });
       return Talks.removeAsync({
         type: 'text',
-        message: message
+        _id: {
+          $in: message
+        }
       })
     }))
     .then(function() {
-      return res.redirect('/rmpcl6')
+      return res.redirect('/rmpcl6/batch')
     })
 });
 var server = http
