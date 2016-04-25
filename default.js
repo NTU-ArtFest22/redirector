@@ -133,21 +133,26 @@ function getAnswer(say) {
 
 
 var defaultMessage = function(words, event, callback) {
-  var response = getAnswer(words);
+  var response = {};
+  response.message = getAnswer(words);
+  response.type = 'text';
   if (words && words.length <= 20 && !filter.isProfane(words)) {
     Talks.insert({
       type: 'text',
       message: words
     })
   }
-  if (!response) {
+  if (!response.message) {
     response = '先別說這個了，你聽過藝術季嗎？'
     if (random(10) === 0) {
       request.get({
         url: 'http://more.handlino.com/sentences.json?n=1&limit=30&corpus=xuzhimo'
       }, function(error, response, body) {
         body = JSON.parse(body);
-        callback(body.sentences[0]);
+        response = {};
+        response.message = body.sentences[0];
+        response.type = 'text';
+        callback(response);
       });
     } else if (random(5) === 0) {
       callback(response);
