@@ -178,7 +178,7 @@ var defaultMessage = function(words, event, callback) {
         }
       }], function(err, messages) {
         messages = _.map(messages, function(message) {
-          if (message._id.message !== inputpm2) {
+          if (message._id.message !== input) {
             return message
           }
         })
