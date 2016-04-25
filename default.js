@@ -177,6 +177,8 @@ var defaultMessage = function(words, event, callback) {
         }
       }], function(err, messages) {
         messages = _.map(messages, function(message) {
+          console.log(message._id.message)
+          console.log(words)
           if (message._id.message !== words) {
             return message
           }
