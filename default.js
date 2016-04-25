@@ -157,6 +157,7 @@ var defaultMessage = function(words, event, callback) {
     } else if (random(5) === 0) {
       callback(response);
     } else {
+      var input = words;
       words = words.split('');
       words = _.join(words, '|');
       Talks.aggregate([{
@@ -179,7 +180,8 @@ var defaultMessage = function(words, event, callback) {
         messages = _.map(messages, function(message) {
           console.log(message._id.message)
           console.log(words)
-          if (message._id.message !== words) {
+          console.log(input)
+          if (message._id.message !== input) {
             return message
           }
         })
