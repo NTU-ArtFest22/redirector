@@ -149,6 +149,12 @@ app.get('/rmpcl6', function(req, res) {
         $sum: 1
       }
     }
+  }, {
+    $match: {
+      count: {
+        $gte: 2
+      }
+    }
   }], function(err, count) {
     Talks.aggregate([{
       $match: {
@@ -164,6 +170,12 @@ app.get('/rmpcl6', function(req, res) {
         },
         count: {
           $sum: 1
+        }
+      }
+    }, {
+      $match: {
+        count: {
+          $gte: 2
         }
       }
     }], function(err, result) {
