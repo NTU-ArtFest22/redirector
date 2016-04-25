@@ -157,46 +157,78 @@ var defaultMessage = function(words, event, callback) {
     } else if (random(5) === 0) {
       callback(response);
     } else {
-      var matching = {
-        count: {
-          $gte: 1
-        }
-      }
-      if (event.senderID === 'web') {
-        matching['_id.type'] = 'text'
-      }
       Talks.aggregate([{
+        $match: {
+          $text: {
+            $search: words
+          },
+          type: 'text'
+        }
+      }, {
         $group: {
           _id: {
             'message': '$message',
-            'type': '$type'
           },
           count: {
             $sum: 1
           }
         }
-      }, {
-        $match: matching
-      }, {
-        $sample: {
-          size: 10
-        }
       }], function(err, messages) {
-        var response = _.find(messages, function(message) {
-          return message._id.type === 'text';
+        messages = _.map(messages, function(message) {
+          if (message._id.message !== words) {
+            return message._id.message
+          }
         })
-        var type = 'text';
-        if (!response) {
-          response = _.maxBy(messages, function(message) {
-            return message.count;
-          })
-          type = 'sticker';
-        }
-        response = {
-          message: response._id.message,
-          type: type
+        messages = _.compact(messages);
+        if (messages.length !== 0 && random(1) === 0) {
+          response = {
+            message: messages[0],
+            type: 'text'
+          };
+          console.log(response);
+          return callback(response);
         };
-        callback(response);
+        var matching = {
+          count: {
+            $gte: 1
+          }
+        }
+        if (event.senderID === 'web') {
+          matching['_id.type'] = 'text'
+        }
+        Talks.aggregate([{
+          $group: {
+            _id: {
+              'message': '$message',
+              'type': '$type'
+            },
+            count: {
+              $sum: 1
+            }
+          }
+        }, {
+          $match: matching
+        }, {
+          $sample: {
+            size: 10
+          }
+        }], function(err, messages) {
+          var response = _.find(messages, function(message) {
+            return message._id.type === 'text';
+          })
+          var type = 'text';
+          if (!response) {
+            response = _.maxBy(messages, function(message) {
+              return message.count;
+            })
+            type = 'sticker';
+          }
+          response = {
+            message: response._id.message,
+            type: type
+          };
+          callback(response);
+        })
       })
     }
   } else {
