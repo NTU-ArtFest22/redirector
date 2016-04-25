@@ -157,10 +157,12 @@ var defaultMessage = function(words, event, callback) {
     } else if (random(5) === 0) {
       callback(response);
     } else {
+      words = words.split('');
+      words = _.join(words, '|');
       Talks.aggregate([{
         $match: {
-          $text: {
-            $search: words
+          message: {
+            $regex: new RegExp(words)
           },
           type: 'text'
         }
@@ -176,16 +178,18 @@ var defaultMessage = function(words, event, callback) {
       }], function(err, messages) {
         messages = _.map(messages, function(message) {
           if (message._id.message !== words) {
-            return message._id.message
+            return message
           }
         })
         messages = _.compact(messages);
         if (messages.length !== 0 && random(1) === 0) {
+          text = _.maxBy(messages, function(message) {
+            return message.count;
+          })
           response = {
-            message: messages[0],
+            message: text._id.message,
             type: 'text'
           };
-          console.log(response);
           return callback(response);
         };
         var matching = {
