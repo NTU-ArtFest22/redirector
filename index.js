@@ -106,6 +106,12 @@ app.get('/rmpcl6/batch', function(req, res) {
         $sum: 1
       }
     }
+  }, {
+    $match: {
+      count: {
+        $gte: 2
+      }
+    }
   }], function(err, count) {
     Talks.aggregate([{
       $match: {
@@ -123,7 +129,13 @@ app.get('/rmpcl6/batch', function(req, res) {
           $sum: 1
         }
       }
-    }], function(err, result) {
+    }, {
+    $match: {
+      count: {
+        $gte: 2
+      }
+    }
+  }], function(err, result) {
       result = _.map(result, function(row) {
         return {
           message: row._id.message,
