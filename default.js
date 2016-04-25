@@ -235,24 +235,28 @@ module.exports = function(event, callback) {
     .exec()
     .then(function(value) {
       if (value && value[0] && value[0][1] >= 5) {
-        return redisClient
+        console.log('ga-attacks-dos')
+        ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
+        redisClient
           .multi()
           .decr(event.threadID)
           .expire(event.threadID, 120)
           .exec();
-        if (value[0][1] > 6) {
-          console.log('ga-attacks-dos')
-          ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
-          return redisClient
-            .multi()
-            .set(event.threadID, 0)
-            .expire(event.threadID, 120)
-            .exec();
-        }
+        return callback({
+          type: 'dos',
+          thread_id: event.threadID
+        })
       }
       ga.event("Receive", "message", event.body).send()
 
       defaultMessage(event.body, event, function(response) {
+        setTimeout(function() {
+          redisClient
+            .multi()
+            .decr(event.threadID)
+            .expire(event.threadID, 120)
+            .exec()
+        }, 3000)
         if (response.type === 'sticker') {
           console.log('ga-sticker-content')
           ga.event("Answer", "Sticker", response).send()

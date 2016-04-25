@@ -26,6 +26,8 @@ global.redisClient = new Redis({
   port: '6379'
 });
 
+redisClient.flushdb();
+
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 
