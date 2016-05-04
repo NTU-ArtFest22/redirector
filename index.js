@@ -109,7 +109,7 @@ app.get('/rmpcl6/batch', function(req, res) {
   }, {
     $match: {
       count: {
-        $gte: 2
+        $gte: 1
       }
     }
   }], function(err, count) {
@@ -132,7 +132,7 @@ app.get('/rmpcl6/batch', function(req, res) {
     }, {
     $match: {
       count: {
-        $gte: 2
+        $gte: 1
       }
     }
   }], function(err, result) {
@@ -164,7 +164,7 @@ app.get('/rmpcl6', function(req, res) {
   }, {
     $match: {
       count: {
-        $gte: 2
+        $gte: 1
       }
     }
   }], function(err, count) {
@@ -187,7 +187,7 @@ app.get('/rmpcl6', function(req, res) {
     }, {
       $match: {
         count: {
-          $gte: 2
+          $gte: 1
         }
       }
     }], function(err, result) {
