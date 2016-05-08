@@ -92,7 +92,6 @@ app.post('/message', function(req, res) {
   })
 })
 app.use(function(req, res, next) {
-  return next();
   if (!req.session.current_user || req.session.current_user.user_type !== 'admin') {
     return res.redirect('http://artfest.ntu.edu.tw/');
   }
