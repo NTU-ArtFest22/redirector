@@ -40,8 +40,9 @@ function random(n) { // 從 0 到 n-1 中選一個亂數
 function getAnswer(say) {
   if (qaList.length <= 4 || updatedQuestions) {
     Question.find({}, function(err, docs) {
+      qaList = defualtQaList
       updatedQuestions = false;
-      qaList.push.apply(defualtQaList, docs)
+      qaList.push.apply(qaList, docs)
     })
   }
   for (var i in qaList) { // 對於每一個 QA
