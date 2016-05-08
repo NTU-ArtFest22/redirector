@@ -19,6 +19,20 @@ var qaList = [{
   A: "你好，久仰久仰!"
 }];
 
+var defualtQaList = [{
+  Q: "謝謝",
+  A: "不客氣!"
+}, {
+  Q: "對不起 | 抱歉 | 不好意思",
+  A: "別說抱歉 !|別客氣，儘管說 !"
+}, {
+  Q: "可否 | 可不可以",
+  A: "你確定想*?"
+}, {
+  Q: "我是",
+  A: "你好，久仰久仰!"
+}];
+
 function random(n) { // 從 0 到 n-1 中選一個亂數
   return Math.floor(Math.random() * n);
 }
@@ -27,7 +41,7 @@ function getAnswer(say) {
   if (qaList.length <= 4 || updatedQuestions) {
     Question.find({}, function(err, docs) {
       updatedQuestions = false;
-      qaList.push.apply(qaList, docs)
+      qaList.push.apply(defualtQaList, docs)
     })
   }
   for (var i in qaList) { // 對於每一個 QA

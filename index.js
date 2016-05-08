@@ -123,6 +123,7 @@ app.post('/rmpcl6/question', function(req, res) {
 app.post('/rmpcl6/question/:id', function(req, res) {
   Question.remove({_id: ObjectId(req.params.id)},
     function(err, docs) {
+    updatedQuestions = true;
       return res.redirect('/rmpcl6/question');
     })
 })
