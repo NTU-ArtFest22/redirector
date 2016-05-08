@@ -4,10 +4,11 @@ var http = require('http');
 var _ = require('lodash');
 var app = express();
 var mongojs = require('mongojs')
-var db = mongojs('ntuaf', ['jokes', 'talks', 'talks_admin'])
+var db = mongojs('ntuaf', ['jokes', 'talks', 'talks_admin', 'questions'])
 var Promise = require('bluebird');
 
 global.Talks = db.talks;
+global.Question = db.questions;
 Promise.promisifyAll(Talks);
 global.Users = db.talks_admin;
 Promise.promisifyAll(Users);
@@ -33,6 +34,8 @@ global.redisClient = new Redis({
 });
 
 redisClient.flushdb();
+
+global.AT_LEAST = 2;
 
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
@@ -89,12 +92,38 @@ app.post('/message', function(req, res) {
   })
 })
 app.use(function(req, res, next) {
+  return next();
   if (!req.session.current_user || req.session.current_user.user_type !== 'admin') {
     return res.redirect('http://artfest.ntu.edu.tw/');
   }
   if (req.session.current_user && req.session.current_user.user_type === 'admin') {
     return next();
   }
+})
+app.get('/rmpcl6/question', function(req, res) {
+  Question.find({},
+    function(err, docs) {
+      return res.render('questions', {
+        questions: docs
+      })
+    })
+})
+app.post('/rmpcl6/question', function(req, res) {
+  var question = req.body.question
+  var answers = req.body.answers.join('|')
+  Question.insert({
+    Q: question,
+    A: answers
+  }, function(err, docs) {
+    return res.redirect('/rmpcl6/question');
+  })
+})
+
+app.post('/rmpcl6/question/:id', function(req, res) {
+  Question.remove({_id: ObjectId(req.params.id)},
+    function(err, docs) {
+      return res.redirect('/rmpcl6/question');
+    })
 })
 app.get('/rmpcl6/batch', function(req, res) {
   Talks.aggregate([{
@@ -109,7 +138,7 @@ app.get('/rmpcl6/batch', function(req, res) {
   }, {
     $match: {
       count: {
-        $gte: 1
+        $gte: AT_LEAST -1
       }
     }
   }], function(err, count) {
@@ -130,12 +159,12 @@ app.get('/rmpcl6/batch', function(req, res) {
         }
       }
     }, {
-    $match: {
-      count: {
-        $gte: 1
+      $match: {
+        count: {
+          $gte: AT_LEAST -1
+        }
       }
-    }
-  }], function(err, result) {
+    }], function(err, result) {
       result = _.map(result, function(row) {
         return {
           message: row._id.message,
@@ -164,7 +193,7 @@ app.get('/rmpcl6', function(req, res) {
   }, {
     $match: {
       count: {
-        $gte: 1
+        $gte: AT_LEAST -1
       }
     }
   }], function(err, count) {
@@ -187,7 +216,7 @@ app.get('/rmpcl6', function(req, res) {
     }, {
       $match: {
         count: {
-          $gte: 1
+          $gte: AT_LEAST -1
         }
       }
     }], function(err, result) {

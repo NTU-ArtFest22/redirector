@@ -2,7 +2,6 @@ var request = require('request');
 var _ = require('lodash');
 var Filter = require('bad-words-chinese'),
   filter = new Filter();
-
 var ua = require('universal-analytics');
 var ga = ua('UA-68973533-7');
 
@@ -16,71 +15,8 @@ var qaList = [{
   Q: "可否 | 可不可以",
   A: "你確定想*?"
 }, {
-  Q: "我想",
-  A: "你為何想*?"
-}, {
-  Q: "我要",
-  A: "你為何要*?"
-}, {
-  Q: "你是",
-  A: "你認為我是*?"
-}, {
-  Q: "認為 | 以為",
-  A: "為何說*?"
-}, {
-  Q: "感覺",
-  A: "常有這種感覺嗎?"
-}, {
-  Q: "為何不",
-  A: "你希望我*!"
-}, {
-  Q: "是否",
-  A: "為何想知道是否*?"
-}, {
-  Q: "不能",
-  A: "為何不能*?|你試過了嗎?|或許你現在能*了呢?"
-}, {
   Q: "我是",
   A: "你好，久仰久仰!"
-}, {
-  Q: "甚麼|什麼|何時|誰|哪裡|如何|為何",
-  A: "為何這樣問?|為何你對這問題有興趣?|你認為答案是甚麼呢?|你認為如何呢?|你常問這類問題嗎?|這真的是你想知道的嗎?|為何不問問別人?|你曾有過類似的問題嗎?|你問這問題的原因是甚麼呢?"
-}, {
-  Q: "原因",
-  A: "這是真正的原因嗎?|還有其他原因嗎?"
-}, {
-  Q: "理由",
-  A: "這說明了甚麼呢?|還有其他理由嗎?"
-}, {
-  Q: "或許",
-  A: "你好像不太確定?"
-}, {
-  Q: "不想|不希望",
-  A: "有沒有甚麼辦法呢?|為何不想*呢?|那你希望怎樣呢?"
-}, {
-  Q: "想|希望",
-  A: "為何想*呢?|真的想*?|那就去做阿?為何不呢?"
-}, {
-  Q: "不",
-  A: "為何不*?|所以你不*?"
-}, {
-  Q: "請",
-  A: "我該如何*呢?|你想要我*嗎?"
-}, {
-  Q: "很像|好像|起來像",
-  A: "有多像?|哪裡像?"
-}, {
-  Q: "對",
-  A: "你確定嗎?|我了解!"
-}, {
-  Q: "朋友",
-  A: "多告訴我一些有關他的事吧!|你認識他多久了呢?"
-}, {
-  Q: "電腦",
-  A: "你說的電腦是指我嗎?"
-}, {
-  Q: "是阿|是的",
-  A: "甚麼事呢?|我可以幫助你嗎?|我希望我能幫得上忙!"
 }];
 
 function random(n) { // 從 0 到 n-1 中選一個亂數
@@ -88,7 +24,12 @@ function random(n) { // 從 0 到 n-1 中選一個亂數
 }
 
 function getAnswer(say) {
-  for (var i in qaList) { // 對於每一個 QA 
+  if (qaList.length <= 4) {
+    Question.find({}, function(err, docs) {
+      qaList.push.apply(qaList, docs)
+    })
+  }
+  for (var i in qaList) { // 對於每一個 QA
     try {
       var qa = qaList[i];
       var qList = qa.Q.split("|"); // 取出 Q 部分，分割成一個一個的問題字串 q
@@ -109,8 +50,6 @@ function getAnswer(say) {
   }
   return false;
 }
-
-
 var defaultMessage = function(words, event, callback) {
   var response = {};
   response.message = getAnswer(words);
@@ -122,8 +61,7 @@ var defaultMessage = function(words, event, callback) {
     })
   }
   if (!response.message) {
-    response = '先別說這個了，你聽過藝術季嗎？'
-    if (random(10) === 0) {
+    if (random(15) === 0) {
       request.get({
         url: 'http://more.handlino.com/sentences.json?n=1&limit=30&corpus=xuzhimo'
       }, function(error, response, body) {
@@ -133,8 +71,6 @@ var defaultMessage = function(words, event, callback) {
         response.type = 'text';
         callback(response);
       });
-    } else if (random(5) === 0) {
-      callback(response);
     } else {
       var input = words;
       words = words.split('');
@@ -174,7 +110,7 @@ var defaultMessage = function(words, event, callback) {
         };
         var matching = {
           count: {
-            $gte: 1
+            $gte: AT_LEAST
           }
         }
         if (event.senderID === 'web') {
@@ -219,8 +155,6 @@ var defaultMessage = function(words, event, callback) {
     callback(response);
   }
 };
-
-
 module.exports = function(event, callback) {
   if (event && event.attachments && event.attachments[0] && event.attachments[0].type === 'sticker') {
     ga.event("Receive", "Sticker", event.attachments[0].stickerID).send()
@@ -264,7 +198,6 @@ module.exports = function(event, callback) {
         })
       }
       ga.event("Receive", "message", event.body).send()
-
       defaultMessage(event.body, event, function(response) {
         setTimeout(function() {
           redisClient

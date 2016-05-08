@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Talks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.26.2/css/uikit.min.css" />
+  </head>
+  <body>
+    <br>
+    <form action='/rmpcl6/question' method="post">
+      <input  type="text" placeholder="Question" name="question">
+      <div class="answers">
+        <input  type="text" placeholder="Answer" name="answers[]">
+      </div>
+      <button type="button" class="add-field">增加回答</button>
+      <input type="submit" value="Submit">
+    </form>
+    <br>
+    <br>
+    <table class="uk-table uk-table-hover uk-table-striped">
+      <thead>
+        <tr>
+          <th>刪除</th>
+          <th>關鍵字</th>
+          <th>答覆</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(var i=0; i<questions.length; i++) {%>
+        <tr>
+          <td rowspan=<%=questions[i].A.split('|').length%> >
+            <form action='/rmpcl6/question/<%=questions[i]._id%>' method="POST">
+              <input type="submit" value="Delete">
+            </form>
+          </td>
+          <td rowspan=<%=questions[i].A.split('|').length%> >
+            <%= questions[i].Q %>
+          </td>
+          <td>
+          <%= questions[i].A.split('|')[0] %>
+          </td>
+            <% for(var k=1; k<questions[i].A.split('|').length; k++) {%>
+              <tr>
+              <td>
+              <%= questions[i].A.split('|')[k] %>
+              </td>
+              </tr>
+            <% } %>
+          <% } %>
+        </tr>
+      </tbody>
+    </table>
+    <script   src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.26.2/js/uikit.min.js"></script>
+    <script type="text/javascript">
+    $(".add-field").click(function(e) {
+    $('.answers input').first().clone(true).appendTo($('.answers'));
+    $('.answers input').last().val('').focus()
+    });
+    </script>
+  </body>
+</html>
