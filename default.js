@@ -24,8 +24,9 @@ function random(n) { // 從 0 到 n-1 中選一個亂數
 }
 
 function getAnswer(say) {
-  if (qaList.length <= 4) {
+  if (qaList.length <= 4 || updatedQuestions) {
     Question.find({}, function(err, docs) {
+      updatedQuestions = false;
       qaList.push.apply(qaList, docs)
     })
   }
@@ -54,13 +55,13 @@ var defaultMessage = function(words, event, callback) {
   var response = {};
   response.message = getAnswer(words);
   response.type = 'text';
-  if (words && words.length <= 20 && !filter.isProfane(words)) {
-    Talks.insert({
-      type: 'text',
-      message: words
-    })
-  }
   if (!response.message) {
+    if (words && words.length <= 20 && !filter.isProfane(words)) {
+      Talks.insert({
+        type: 'text',
+        message: words
+      })
+    }
     if (random(15) === 0) {
       request.get({
         url: 'http://more.handlino.com/sentences.json?n=1&limit=30&corpus=xuzhimo'

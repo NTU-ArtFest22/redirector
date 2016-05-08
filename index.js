@@ -18,6 +18,7 @@ Talks.ensureIndex({
 
 var ObjectId = require('mongojs').ObjectID;
 
+global.updatedQuestions = false;
 
 var bodyParser = require('body-parser');
 
@@ -114,6 +115,7 @@ app.post('/rmpcl6/question', function(req, res) {
     Q: question,
     A: answers
   }, function(err, docs) {
+    updatedQuestions = true;
     return res.redirect('/rmpcl6/question');
   })
 })
