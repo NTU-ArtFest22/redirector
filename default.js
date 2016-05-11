@@ -42,7 +42,7 @@ function getAnswer(say) {
     Question.find({}, function(err, docs) {
       qaList = [];
       updatedQuestions = false;
-      qaList.push.apply(defualtQaList, docs)
+      qaList = defualtQaList.concat(docs);
       console.log(defualtQaList)
       console.log(docs)
       console.log(qaList)
