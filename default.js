@@ -43,6 +43,8 @@ function getAnswer(say) {
       qaList = [];
       updatedQuestions = false;
       qaList.push.apply(defualtQaList, docs)
+      console.log(defualtQaList)
+      console.log(docs)
       console.log(qaList)
     })
   }
