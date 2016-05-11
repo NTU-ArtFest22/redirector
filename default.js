@@ -91,6 +91,7 @@ var defaultMessage = function(words, event, callback) {
       var input = words;
       words = words.split('');
       words = _.join(words, '|');
+      words = _.escapeRegExp(words);
       Talks.aggregate([{
         $match: {
           message: {
