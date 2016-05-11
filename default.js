@@ -43,9 +43,6 @@ function getAnswer(say) {
       qaList = [];
       updatedQuestions = false;
       qaList = defualtQaList.concat(docs);
-      console.log(defualtQaList)
-      console.log(docs)
-      console.log(qaList)
     })
   }
   for (var i in qaList) { // 對於每一個 QA
