@@ -19,7 +19,7 @@ var qaList = [{
   A: "你好，久仰久仰!"
 }];
 
-var defualtQaList = [{
+const defualtQaList = [{
   Q: "謝謝",
   A: "不客氣!"
 }, {
