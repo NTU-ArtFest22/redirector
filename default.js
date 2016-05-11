@@ -9,10 +9,10 @@ var qaList = [{
   Q: "謝謝",
   A: "不客氣!"
 }, {
-  Q: "對不起 | 抱歉 | 不好意思",
+  Q: "對不起|抱歉|不好意思",
   A: "別說抱歉 !|別客氣，儘管說 !"
 }, {
-  Q: "可否 | 可不可以",
+  Q: "可否|可不可以",
   A: "你確定想*?"
 }, {
   Q: "我是",
@@ -23,10 +23,10 @@ var defualtQaList = [{
   Q: "謝謝",
   A: "不客氣!"
 }, {
-  Q: "對不起 | 抱歉 | 不好意思",
+  Q: "對不起|抱歉|不好意思",
   A: "別說抱歉 !|別客氣，儘管說 !"
 }, {
-  Q: "可否 | 可不可以",
+  Q: "可否|可不可以",
   A: "你確定想*?"
 }, {
   Q: "我是",
@@ -43,6 +43,7 @@ function getAnswer(say) {
       qaList = defualtQaList
       updatedQuestions = false;
       qaList.push.apply(qaList, docs)
+      console.log(qaList)
     })
   }
   for (var i in qaList) { // 對於每一個 QA
@@ -67,6 +68,23 @@ function getAnswer(say) {
   return false;
 }
 var defaultMessage = function(words, event, callback) {
+  if (!words) {
+    return Talks.aggregate([{
+      $match: {
+        type: 'sticker'
+      }
+    }, {
+      $sample: {
+        size: 1
+      }
+    }], function(err, message) {
+      return callback({
+        type: 'sticker',
+        content: message[0].message,
+        thread_id: event.threadID
+      })
+    });
+  }
   var response = {};
   response.message = getAnswer(words);
   response.type = 'text';
