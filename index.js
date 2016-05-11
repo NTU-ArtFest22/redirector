@@ -61,12 +61,8 @@ app.use(session({
 app.set('view engine', 'ejs');
 app.set('port', config.port || 3000);
 app.get('/m', function(req, res) {
-  var firstManUrl = _.head(config.targetsMan);
+  var firstManUrl = _.head(config.targets);
   return res.redirect(firstManUrl);
-});
-app.get('/w', function(req, res) {
-  var firstWomanUrl = _.head(config.targetsWoman);
-  return res.redirect(firstWomanUrl);
 });
 app.get('/login', function(req, res) {
   return res.render('login')

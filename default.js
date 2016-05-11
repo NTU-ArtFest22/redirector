@@ -91,7 +91,12 @@ var defaultMessage = function(words, event, callback) {
   response.message = getAnswer(words);
   response.type = 'text';
   if (!response.message) {
-    if (words && words.length <= 20 && !filter.isProfane(words)) {
+    if (
+      event.senderID !== 'web' &&
+      words &&
+      words.length <= 20 &&
+      !filter.isProfane(words)
+    ) {
       Talks.insert({
         type: 'text',
         message: words
@@ -234,7 +239,11 @@ module.exports = function(event, callback) {
           thread_id: event.threadID
         })
       }
-      ga.event("Receive", "message", event.body).send()
+      if (event.senderID === 'web') {
+        ga.event("Receive", "web_message", event.body).send()
+      } else {
+        ga.event("Receive", "message", event.body).send()
+      }
       defaultMessage(event.body, event, function(response) {
         setTimeout(function() {
           redisClient
