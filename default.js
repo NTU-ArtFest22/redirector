@@ -43,6 +43,10 @@ function getAnswer(say) {
       qaList = [];
       updatedQuestions = false;
       qaList = defualtQaList.concat(docs);
+      qaList = _.sortBy(qaList, function(question) {
+        return question.Q.length;
+      });
+      qaList = _.reverse(qaList);
     })
   }
   for (var i in qaList) { // 對於每一個 QA
