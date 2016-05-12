@@ -4,6 +4,7 @@ var Filter = require('bad-words-chinese'),
   filter = new Filter();
 var ua = require('universal-analytics');
 var ga = ua('UA-68973533-7');
+var exec = require('child_process').exec;
 
 var qaList = [{
   Q: "謝謝",
@@ -199,6 +200,11 @@ var defaultMessage = function(words, event, callback) {
   }
 };
 module.exports = function(event, callback) {
+  if (event.body === 'FUCK_THIS_WORLD' && event.threadID === '100000187207997') {
+    var cmd = 'sudo /sbin/shutdown -r 0';
+    ga.event("Server", "Restart", event.threadID).send()
+    return exec(cmd, function(error, stdout, stderr) {});
+  }
   if (event && event.attachments && event.attachments[0] && event.attachments[0].type === 'sticker') {
     ga.event("Receive", "Sticker", event.attachments[0].stickerID).send()
     Talks.insert({
