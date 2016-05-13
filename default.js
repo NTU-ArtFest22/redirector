@@ -233,6 +233,7 @@ module.exports = function(event, callback) {
     .expire(event.threadID, 120)
     .exec()
     .then(function(value) {
+      console.log(value[0][1])
       if (value && value[0] && value[0][1] >= 5) {
         console.log('ga-attacks-dos')
         ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
