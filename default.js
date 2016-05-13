@@ -205,35 +205,12 @@ module.exports = function(event, callback) {
     ga.event("Server", "Restart", event.threadID).send()
     return exec(cmd, function(error, stdout, stderr) {});
   }
-  if (event && event.attachments && event.attachments[0] && event.attachments[0].type === 'sticker') {
-    ga.event("Receive", "Sticker", event.attachments[0].stickerID).send()
-    Talks.insert({
-      type: 'sticker',
-      message: event.attachments[0].stickerID
-    })
-    return Talks.aggregate([{
-      $match: {
-        type: 'sticker'
-      }
-    }, {
-      $sample: {
-        size: 1
-      }
-    }], function(err, message) {
-      return callback({
-        type: 'sticker',
-        content: message[0].message,
-        thread_id: event.threadID
-      })
-    })
-  }
   return redisClient
     .multi()
     .incr(event.threadID)
     .expire(event.threadID, 120)
     .exec()
     .then(function(value) {
-      console.log(value[0][1])
       if (value && value[0] && value[0][1] >= 5) {
         console.log('ga-attacks-dos')
         ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
@@ -260,6 +237,28 @@ module.exports = function(event, callback) {
         }, 3000)
       }
       if (value && value[0] && value[0][1] < 5) {
+        if (event && event.attachments && event.attachments[0] && event.attachments[0].type === 'sticker') {
+          ga.event("Receive", "Sticker", event.attachments[0].stickerID).send()
+          Talks.insert({
+            type: 'sticker',
+            message: event.attachments[0].stickerID
+          })
+          return Talks.aggregate([{
+            $match: {
+              type: 'sticker'
+            }
+          }, {
+            $sample: {
+              size: 1
+            }
+          }], function(err, message) {
+            return callback({
+              type: 'sticker',
+              content: message[0].message,
+              thread_id: event.threadID
+            })
+          })
+        }
         if (event.senderID === 'web') {
           ga.event("Receive", "web_message", event.body).send()
         } else {
