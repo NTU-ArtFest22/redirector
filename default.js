@@ -236,15 +236,28 @@ module.exports = function(event, callback) {
       if (value && value[0] && value[0][1] >= 5) {
         console.log('ga-attacks-dos')
         ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
-        redisClient
-          .multi()
-          .decr(event.threadID)
-          .expire(event.threadID, 120)
-          .exec();
-        return callback({
-          type: 'dos',
-          thread_id: event.threadID
-        })
+
+        message = _.sample([
+          '你好吵ㄛ',
+          '你怎麼這麼多話',
+          '你還洗～～～～',
+          '你幾歲啊',
+          '你幼稚鬼'
+        ])
+        setTimeout(function() {
+          redisClient
+            .multi()
+            .decr(event.threadID)
+            .expire(event.threadID, 120)
+            .exec();
+          if (random(10) === 0) {
+            return callback({
+              type: 'message',
+              content: message,
+              thread_id: event.threadID
+            })
+          }
+        }, Math.floor(Math.random() * 2) * 1000)
       }
       if (event.senderID === 'web') {
         ga.event("Receive", "web_message", event.body).send()
