@@ -34,8 +34,6 @@ global.redisClient = new Redis({
   port: '6379'
 });
 
-redisClient.flushdb();
-
 global.AT_LEAST = 2;
 
 var session = require('express-session');
