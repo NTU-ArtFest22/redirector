@@ -6,8 +6,6 @@ var ua = require('universal-analytics');
 var ga = ua('UA-68973533-7');
 var exec = require('child_process').exec;
 
-var redisPrefix = 'threadID';
-
 var qaList = [{
   Q: "謝謝",
   A: "不客氣!"

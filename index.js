@@ -34,6 +34,8 @@ global.redisClient = new Redis({
   port: '6379'
 });
 
+global.redisPrefix = 'threadID';
+
 redisClient
   .multi()
   .set(redisPrefix + '*', 0)
