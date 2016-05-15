@@ -34,6 +34,11 @@ global.redisClient = new Redis({
   port: '6379'
 });
 
+redisClient
+  .multi()
+  .set(redisPrefix + '*', 0)
+  .exec();
+
 global.AT_LEAST = 2;
 
 var session = require('express-session');
@@ -115,9 +120,11 @@ app.post('/rmpcl6/question', function(req, res) {
 })
 
 app.post('/rmpcl6/question/:id', function(req, res) {
-  Question.remove({_id: ObjectId(req.params.id)},
+  Question.remove({
+      _id: ObjectId(req.params.id)
+    },
     function(err, docs) {
-    updatedQuestions = true;
+      updatedQuestions = true;
       return res.redirect('/rmpcl6/question');
     })
 })
@@ -134,7 +141,7 @@ app.get('/rmpcl6/batch', function(req, res) {
   }, {
     $match: {
       count: {
-        $gte: AT_LEAST -1
+        $gte: AT_LEAST - 1
       }
     }
   }], function(err, count) {
@@ -157,7 +164,7 @@ app.get('/rmpcl6/batch', function(req, res) {
     }, {
       $match: {
         count: {
-          $gte: AT_LEAST -1
+          $gte: AT_LEAST - 1
         }
       }
     }], function(err, result) {
@@ -189,7 +196,7 @@ app.get('/rmpcl6', function(req, res) {
   }, {
     $match: {
       count: {
-        $gte: AT_LEAST -1
+        $gte: AT_LEAST - 1
       }
     }
   }], function(err, count) {
@@ -212,7 +219,7 @@ app.get('/rmpcl6', function(req, res) {
     }, {
       $match: {
         count: {
-          $gte: AT_LEAST -1
+          $gte: AT_LEAST - 1
         }
       }
     }], function(err, result) {
