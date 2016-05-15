@@ -6,6 +6,8 @@ var ua = require('universal-analytics');
 var ga = ua('UA-68973533-7');
 var exec = require('child_process').exec;
 
+var redisPrefix = 'threadID';
+
 var qaList = [{
   Q: "謝謝",
   A: "不客氣!"
@@ -207,20 +209,21 @@ module.exports = function(event, callback) {
   }
   return redisClient
     .multi()
-    .incr(event.threadID)
-    .expire(event.threadID, 120)
+    .incr(redisPrefix + event.threadID)
+    .expire(redisPrefix + event.threadID, 120)
     .exec()
     .then(function(value) {
+      console.log(value)
       if (value && value[0] && value[0][1] >= 5) {
         console.log('ga-attacks-dos')
         ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
         setTimeout(function() {
           redisClient
             .multi()
-            .decr(event.threadID)
-            .expire(event.threadID, 120)
+            .decr(redisPrefix + event.threadID)
+            .expire(redisPrefix + event.threadID, 120)
             .exec();
-          if (random(10) === 0) {
+          if (random(3) === 0) {
             message = _.sample([
               '你好吵ㄛ',
               '你怎麼這麼多話',
@@ -268,8 +271,8 @@ module.exports = function(event, callback) {
           setTimeout(function() {
             redisClient
               .multi()
-              .decr(event.threadID)
-              .expire(event.threadID, 120)
+              .decr(redisPrefix + event.threadID)
+              .expire(redisPrefix + event.threadID, 120)
               .exec()
           }, 3000)
           if (response.type === 'sticker') {
