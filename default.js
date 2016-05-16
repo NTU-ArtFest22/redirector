@@ -205,6 +205,7 @@ module.exports = function(event, callback) {
     ga.event("Server", "Restart", event.threadID).send()
     return exec(cmd, function(error, stdout, stderr) {});
   }
+  console.log(event)
   return redisClient
     .multi()
     .incr(redisPrefix + event.threadID)
