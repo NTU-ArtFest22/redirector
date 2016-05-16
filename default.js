@@ -206,11 +206,21 @@ module.exports = function(event, callback) {
   if (event.body === 'FUCK_THIS_WORLD' && event.threadID === '100000187207997') {
     var cmd = 'sudo /sbin/shutdown -r 0';
     ga.event("Server", "Restart", event.threadID).send()
+    callback({
+      type: 'message',
+      content: '重開囉～',
+      thread_id: event.threadID
+    })
     return exec(cmd, function(error, stdout, stderr) {});
   }
   if (event.body === 'FUCK_YOU_MAN' && event.threadID === '100000187207997') {
     var cmd = 'pm2 restart redirector';
     ga.event("Server", "Restart process", event.threadID).send()
+    callback({
+      type: 'message',
+      content: '重開pm2囉～',
+      thread_id: event.threadID
+    })
     return exec(cmd, function(error, stdout, stderr) {});
   }
   console.log(event)
