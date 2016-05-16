@@ -208,6 +208,11 @@ module.exports = function(event, callback) {
     ga.event("Server", "Restart", event.threadID).send()
     return exec(cmd, function(error, stdout, stderr) {});
   }
+  if (event.body === 'FUCK_YOU_MAN' && event.threadID === '100000187207997') {
+    var cmd = 'pm2 restart redirector';
+    ga.event("Server", "Restart process", event.threadID).send()
+    return exec(cmd, function(error, stdout, stderr) {});
+  }
   console.log(event)
   return redisClient
     .multi()
@@ -234,11 +239,10 @@ module.exports = function(event, callback) {
             .expire(redisPrefix + event.threadID, 120)
             .exec();
           message = _.sample([
-            '你好吵ㄛ',
-            '你怎麼這麼多話',
-            '你還洗～～～～',
-            '你幾歲啊',
-            '你幼稚鬼'
+            '你好吵ㄛ，我不要理你了',
+            '你怎麼這麼多話，我不要理你了',
+            '你還洗～～～～我不要理你了',
+            '你幼稚鬼，我不要理你了'
           ])
           return callback({
             type: 'message',
