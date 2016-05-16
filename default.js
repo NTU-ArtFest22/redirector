@@ -6,7 +6,8 @@ var ua = require('universal-analytics');
 var ga = ua('UA-68973533-7');
 var exec = require('child_process').exec;
 
-var EventEmitter = require('events');
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
 
 var qaList = [{
   Q: "謝謝",
@@ -217,7 +218,7 @@ module.exports = function(event, callback) {
       console.log(value)
       if (value && value[0] && value[0][1] >= 5) {
         console.log('ga-attacks-dos')
-        EventEmitter.emit(redisPrefix + 'dos' + event.threadID);
+        eventEmitter.emit(redisPrefix + 'dos' + event.threadID);
         var timer = setTimeout(function() {
           redisClient
             .multi()
@@ -238,7 +239,7 @@ module.exports = function(event, callback) {
           })
         }, 3000)
         ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
-        EventEmitter.on(redisPrefix + 'dos' + event.threadID, function() {
+        eventEmitter.on(redisPrefix + 'dos' + event.threadID, function() {
           clearTimeout(timer);
           return callback({
             type: 'skip',
