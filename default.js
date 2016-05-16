@@ -6,6 +6,8 @@ var ua = require('universal-analytics');
 var ga = ua('UA-68973533-7');
 var exec = require('child_process').exec;
 
+var EventEmitter = require('events');
+
 var qaList = [{
   Q: "謝謝",
   A: "不客氣!"
@@ -215,28 +217,34 @@ module.exports = function(event, callback) {
       console.log(value)
       if (value && value[0] && value[0][1] >= 5) {
         console.log('ga-attacks-dos')
-        ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
-        setTimeout(function() {
+        EventEmitter.emit(redisPrefix + 'dos' + event.threadID);
+        var timer = setTimeout(function() {
           redisClient
             .multi()
             .decr(redisPrefix + event.threadID)
             .expire(redisPrefix + event.threadID, 120)
             .exec();
-          if (random(3) === 0) {
-            message = _.sample([
-              '你好吵ㄛ',
-              '你怎麼這麼多話',
-              '你還洗～～～～',
-              '你幾歲啊',
-              '你幼稚鬼'
-            ])
-            return callback({
-              type: 'message',
-              content: message,
-              thread_id: event.threadID
-            })
-          }
+          message = _.sample([
+            '你好吵ㄛ',
+            '你怎麼這麼多話',
+            '你還洗～～～～',
+            '你幾歲啊',
+            '你幼稚鬼'
+          ])
+          return callback({
+            type: 'message',
+            content: message,
+            thread_id: event.threadID
+          })
         }, 3000)
+        ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
+        EventEmitter.on(redisPrefix + 'dos' + event.threadID, function() {
+          clearTimeout(timer);
+          return callback({
+            type: 'skip',
+            thread_id: event.threadID
+          })
+        });
       }
       if (value && value[0] && value[0][1] < 5) {
         if (event && event.attachments && event.attachments[0] && event.attachments[0].type === 'sticker') {
