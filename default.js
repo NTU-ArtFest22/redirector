@@ -218,7 +218,15 @@ module.exports = function(event, callback) {
       console.log(value)
       if (value && value[0] && value[0][1] >= 5) {
         console.log('ga-attacks-dos')
+        ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
         eventEmitter.emit(redisPrefix + 'dos' + event.threadID);
+        setTimeout(function() {
+          redisClient
+            .multi()
+            .decr(redisPrefix + event.threadID)
+            .expire(redisPrefix + event.threadID, 120)
+            .exec();
+        }, 3000)
         var timer = setTimeout(function() {
           redisClient
             .multi()
@@ -238,13 +246,15 @@ module.exports = function(event, callback) {
             thread_id: event.threadID
           })
         }, 3000)
-        ga.event("Receive", "Attacks_possible_DOS", event.senderID).send()
         eventEmitter.on(redisPrefix + 'dos' + event.threadID, function() {
           clearTimeout(timer);
-          return callback({
-            type: 'skip',
-            thread_id: event.threadID
-          })
+          console.log(timer)
+          if (!timer) {
+            return callback({
+              type: 'skip',
+              thread_id: event.threadID
+            })
+          }
         });
       }
       if (value && value[0] && value[0][1] < 5) {
