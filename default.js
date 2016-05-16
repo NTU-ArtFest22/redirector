@@ -246,15 +246,12 @@ module.exports = function(event, callback) {
             thread_id: event.threadID
           })
         }, 3000)
-        eventEmitter.on(redisPrefix + 'dos' + event.threadID, function() {
+        eventEmitter.once(redisPrefix + 'dos' + event.threadID, function() {
           clearTimeout(timer);
-          console.log(timer)
-          if (!timer) {
-            return callback({
-              type: 'skip',
-              thread_id: event.threadID
-            })
-          }
+          return callback({
+            type: 'skip',
+            thread_id: event.threadID
+          })
         });
       }
       if (value && value[0] && value[0][1] < 5) {
