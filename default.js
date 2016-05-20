@@ -308,12 +308,12 @@ module.exports = function(event, callback) {
               thread_id: event.threadID
             })
           })
-        } else if (message && message.attachments && message.attachments[0] && message.attachments[0].type === 'photo') {
+        } else if (event && event.attachments && event.attachments[0] && event.attachments[0].type === 'photo') {
           Talks.insert({
             type: 'photo',
             message: event.attachments[0].hiresUrl
           })
-        } else if (message && message.attachments && message.attachments[0] && message.attachments[0].type === 'file') {
+        } else if (event && event.attachments && event.attachments[0] && event.attachments[0].type === 'file') {
           Talks.insert({
             type: 'file',
             message: event.attachments[0].url
