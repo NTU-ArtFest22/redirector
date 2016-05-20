@@ -41,7 +41,7 @@ redisClient
   .set(redisPrefix + '*', 0)
   .exec();
 
-global.AT_LEAST = 2;
+global.AT_LEAST = 5;
 
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);

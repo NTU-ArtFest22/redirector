@@ -145,7 +145,7 @@ var defaultMessage = function(words, event, callback) {
           }
         })
         messages = _.compact(messages);
-        if (messages.length !== 0 && random(3) === 0) {
+        if (messages.length !== 0 && random(5) !== 0) {
           text = _.maxBy(messages, function(message) {
             return message.count;
           })
@@ -174,17 +174,35 @@ var defaultMessage = function(words, event, callback) {
             }
           }
         }, {
-          $match: matching
+          $match: {
+            $or: [
+              matching, {
+                type: 'file'
+              }, {
+                type: 'photo'
+              }
+            ]
+          }
         }, {
           $sample: {
             size: 10
           }
         }], function(err, messages) {
+          var file = _.find(messages, function(message) {
+            return message._id.type === 'file';
+          })
+          var photo = _.find(messages, function(message) {
+            return message._id.type === 'photo';
+          })
           var response = _.find(messages, function(message) {
             return message._id.type === 'text';
           })
-          var type = 'text';
-          if (!response) {
+          var type = 'file';
+          if (!file) {
+            type = 'photo';
+          } else if (!photo) {
+            type = 'text'
+          } else if (!response) {
             response = _.maxBy(messages, function(message) {
               return message.count;
             })
@@ -289,6 +307,16 @@ module.exports = function(event, callback) {
               content: message[0].message,
               thread_id: event.threadID
             })
+          })
+        } else if (message && message.attachments && message.attachments[0] && message.attachments[0].type === 'photo') {
+          Talks.insert({
+            type: 'photo',
+            message: event.attachments[0].hiresUrl
+          })
+        } else if (message && message.attachments && message.attachments[0] && message.attachments[0].type === 'file') {
+          Talks.insert({
+            type: 'file',
+            message: event.attachments[0].url
           })
         }
         if (event.senderID === 'web') {
