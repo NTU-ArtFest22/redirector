@@ -194,24 +194,38 @@ var defaultMessage = function(words, event, callback) {
           var photo = _.find(messages, function(message) {
             return message._id.type === 'photo';
           })
-          var response = _.find(messages, function(message) {
+          var text = _.find(messages, function(message) {
             return message._id.type === 'text';
           })
-          var type = 'file';
-          if (!file) {
+          var type = '';
+          if (!!file) {
+            type = 'file';
+            response = {
+              message: file._id.message,
+              type: type
+            };
+          } else if (!!photo) {
             type = 'photo';
-          } else if (!photo) {
-            type = 'text'
-          } else if (!response) {
+            response = {
+              message: photo._id.message,
+              type: type
+            };
+          } else if (!!text) {
+            type = 'text';
+            response = {
+              message: text._id.message,
+              type: type
+            };
+          } else {
             response = _.maxBy(messages, function(message) {
               return message.count;
             })
             type = 'sticker';
+            response = {
+              message: response._id.message,
+              type: type
+            };
           }
-          response = {
-            message: response._id.message,
-            type: type
-          };
           callback(response);
         })
       })
