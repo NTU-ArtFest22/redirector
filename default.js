@@ -340,6 +340,18 @@ module.exports = function(event, callback) {
               sticker: response.message,
               thread_id: event.threadID
             })
+          } else if (response.type === 'photo') {
+            return callback({
+              type: 'photo',
+              content: response.message,
+              thread_id: event.threadID
+            })
+          } else if (response.type === 'file') {
+            return callback({
+              type: 'file',
+              content: response.message,
+              thread_id: event.threadID
+            })
           } else {
             if (response.type === 'text') {
               response = response.message
