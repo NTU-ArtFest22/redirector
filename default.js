@@ -332,6 +332,7 @@ module.exports = function(event, callback) {
               .expire(redisPrefix + event.threadID, 120)
               .exec()
           }, 3000)
+          console.log(response)
           if (response.type === 'sticker') {
             console.log('ga-sticker-content')
             ga.event("Answer", "Sticker", response).send()
